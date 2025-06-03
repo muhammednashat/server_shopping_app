@@ -1,13 +1,11 @@
 const { Schema, model } = require("mongoose");
 
 const userSchema = Schema({
-    name:{type:String, required:true},
-    email:{type:String, required:true},
-    street:String,
-     apartment:String,
-      city:String,
+    name:{type:String,required:true,trim : true},
+    email:{type:String,required:true,trim : true},
     phone:{type:String ,required:true,trim : true},
-    isAdmin:{type:Boolean, default:false}  ,
+    isAdmin:{type:Boolean, default:false},
+    address:String,
     passwordHash:String,
     resetPasswordOtp:Number,
     resetPasswordOtpExpires:Date,

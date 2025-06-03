@@ -19,7 +19,7 @@ app.use(morgan('tiny'))
 app.use(cors());
 
 app.use(`${apiUrl}/`,authRouter)
-
+app.get('/any',(req,res) =>{return res.json({ok:"ok"})})
 
 mongoos.connect(mongoDbConnectionString).then(()=>{console.error('Connected with mongoDb')}).catch((error) =>{console.error(error)}) ;
 
