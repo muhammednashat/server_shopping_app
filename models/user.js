@@ -5,7 +5,7 @@ const userSchema = Schema({
     email:{type:String,required:true,trim : true},
     phone:{type:String ,required:true,trim : true},
     isAdmin:{type:Boolean, default:false},
-    address:String,
+    address:{type:String },
     passwordHash:String,
     resetPasswordOtp:Number,
     resetPasswordOtpExpires:Date,

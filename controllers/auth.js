@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
       
        user.passwordHash = undefined;
 
-        return res.json({ 'user': user , 'token':accessToken})
+        return res.json(user)
     } catch (error) {
         console.log(error)
         return res.status(505).json({ error: error.message })
@@ -70,7 +70,7 @@ exports.register = async function (req, res) {
         })
         user = await user.save()
         console.log(user)
-        return res.status(201).json(user)
+        return res.json(user)
     } catch (error) {
         return res.status(500).json({ type: error.name, message: error.message })
     }

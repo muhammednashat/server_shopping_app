@@ -5,6 +5,15 @@ const morgan = require('morgan')
 const cors = require('cors')
 const authRouter = require('./routes/auth')
 
+//  start
+const admin = require('firebase-admin');
+// Initialize Firebase Admin SDK
+var serviceAccount = require("./serviceAcount.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://myproject-18932-default-rtdb.firebaseio.com"
+});
+// end
 
 require('dotenv/config')
 const env = process.env
@@ -21,7 +30,26 @@ app.use(cors());
 app.use(`${apiUrl}/`,authRouter)
 app.get('/any',(req,res) =>{return res.json({ok:"ok"})})
 
+// API endpoint to send notifications
+app.post('/send-notification', async (req, res) => {
+  const { token, title, body } = req.body;
+  
+  try {
+     console.log(req.body)
+    await admin.messaging().send({
+      token: token,
+      notification: { title, body },
+    });
+    res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 mongoos.connect(mongoDbConnectionString).then(()=>{console.error('Connected with mongoDb')}).catch((error) =>{console.error(error)}) ;
+
+
 
 
 app.listen(port, hostName, () => {
