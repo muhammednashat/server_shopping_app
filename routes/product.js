@@ -2,10 +2,31 @@
 //
 
 // create a router to handling routes.
-const app = require('express').Router();
+const router = require('express').Router();
 const {Product} = require('../models/product')
 
+router.post('/add-product',async (req,res) => {
+    try {
+    console.log(req.body)
+    const {imageUrl, brandName} = req.body
+     var product = Product({...req.body})
+  try {
+   product = await product.save()
+     return res.json(product);
+    
+    
+  } catch (error) {
+    return res.json({error:"error2 "}) ;   
+    
+  }
 
+    //  console.log(product)
+    
+ return res.json({msg:"done2"});
+    } catch (error) {
+    return res.json({error:"error"}) ;   
+    }
+})
 
 
 // export router

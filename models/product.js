@@ -3,7 +3,7 @@
 const {Schema, model} = require('mongoose')
 
 //create a schema
-const productSchema = Schema( {
+const productSchema = Schema({
   imageUrl:String,
   brandName:String,
 });

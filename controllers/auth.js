@@ -69,7 +69,6 @@ exports.register = async function (req, res) {
             passwordHash: bcrypt.hashSync(req.body.password, 8),
         })
         user = await user.save()
-        console.log(user)
         return res.json(user)
     } catch (error) {
         return res.status(500).json({ type: error.name, message: error.message })

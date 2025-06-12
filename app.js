@@ -4,6 +4,7 @@ const mongoos = require('mongoose')
 const morgan = require('morgan')
 const cors = require('cors')
 const authRouter = require('./routes/auth')
+const productRouter = require('./routes/product')
 
 //  start
 const admin = require('firebase-admin');
@@ -28,6 +29,7 @@ app.use(morgan('tiny'))
 app.use(cors());
 
 app.use(`${apiUrl}/`,authRouter)
+app.use(`${apiUrl}/`,productRouter)
 app.get('/any',(req,res) =>{return res.json({ok:"ok"})})
 
 // API endpoint to send notifications
