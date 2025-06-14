@@ -4,8 +4,16 @@ const {Schema, model} = require('mongoose')
 
 //create a schema
 const productSchema = Schema({
+  name:String,
   imageUrl:String,
+  category:String,
+  isnew: Boolean,
+  isOnSale: Boolean,  
   brandName:String,
+  rating:Number,
+  originalPrice:Number,
+  salePrice:Number,
+  discount:String, 
 });
 
 

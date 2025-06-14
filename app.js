@@ -35,7 +35,7 @@ app.get('/any',(req,res) =>{return res.json({ok:"ok"})})
 // API endpoint to send notifications
 app.post('/send-notification', async (req, res) => {
   const { token, title, body } = req.body;
-  
+  console.log(req.body)
   try {
      console.log(req.body)
     await admin.messaging().send({
