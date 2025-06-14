@@ -28,16 +28,24 @@ app.use(bodyParser.json())
 app.use(morgan('tiny'))
 app.use(cors());
 
-app.use(`${apiUrl}/`,authRouter)
-app.use(`${apiUrl}/`,productRouter)
-app.get('/any',(req,res) =>{return res.json({ok:"ok"})})
+app.use(`${apiUrl}/`, authRouter)
+app.use(`${apiUrl}/`, productRouter)
+app.get('/any', (req, res) => { return res.json({ ok: "ok" }) })
 
 // API endpoint to send notifications
 app.post('/send-notification', async (req, res) => {
-  const { token, title, body } = req.body;
-  console.log(req.body)
+  const { userId, title, body } = req.body;
+
   try {
-     console.log(req.body)
+    console.log(req.body)
+    const db = admin.firestore();
+   const usersCollection = db.collection('Users');
+   const token = (await usersCollection.doc(userId).get()).get('token');
+   console.log('----------------------------')
+   console.log(token) 
+   console.log('----------------------------')
+
+
     await admin.messaging().send({
       token: token,
       notification: { title, body },
@@ -49,11 +57,11 @@ app.post('/send-notification', async (req, res) => {
 });
 
 
-mongoos.connect(mongoDbConnectionString).then(()=>{console.error('Connected with mongoDb')}).catch((error) =>{console.error(error)}) ;
+mongoos.connect(mongoDbConnectionString).then(() => { console.error('Connected with mongoDb') }).catch((error) => { console.error(error) });
 
 
 
 
 app.listen(port, hostName, () => {
-    console.log(`the server is running at http://${hostName}:${port}`)
+  console.log(`the server is running at http://${hostName}:${port}`)
 });
