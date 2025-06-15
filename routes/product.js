@@ -10,7 +10,7 @@ router.get('/sale-products', async(req, res) =>{
 try {
   const query = {"isOnSale":true};
   const products = await Product.find(query)
-  console.log(products)
+  
   return res.json(products)
 } catch (error) {
     return res.json({ error: error });
@@ -24,8 +24,7 @@ router.get('/new-products', async (req, res) => {
     const query ={"isnew":true};
     var products = await Product.find(query)
     console.log(products)
-    return res.status(201).json(products);
-
+    return res.json(products);
   } catch (error) {
     return res.json({ error: "error2 " });
   }
