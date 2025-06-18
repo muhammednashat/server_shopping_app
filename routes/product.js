@@ -4,24 +4,26 @@
 // create a router to handling routes.
 const router = require('express').Router();
 const { Product } = require('../models/product')
+  const path = require("path");
+    const fs = require("fs");
+const { body } = require('express-validator');
 
+router.get('/sale-products', async (req, res) => {
+  try {
+    const query = { "isOnSale": true };
+    const products = await Product.find(query)
 
-router.get('/sale-products', async(req, res) =>{
-try {
-  const query = {"isOnSale":true};
-  const products = await Product.find(query)
-  
-  return res.json(products)
-} catch (error) {
+    return res.json(products)
+  } catch (error) {
     return res.json({ error: error });
-}
+  }
 });
 
 
 
 router.get('/new-products', async (req, res) => {
   try {
-    const query ={"isnew":true};
+    const query = { "isnew": true };
     var products = await Product.find(query)
     console.log(products)
     return res.json(products);
@@ -31,23 +33,58 @@ router.get('/new-products', async (req, res) => {
 })
 
 
-router.get('/add', async(req,res) =>{
-   return res.status(201).json({msg:"do"});
+router.post('/update-products', async (req, res) => {
+ try {
+  const products = await Product.find({"mainCategory":"Women", "subCategory":"Tops"});
+  products.forEach(async product =>  {
+    const newImageUrl = 
+      'https://raw.githubusercontent.com/muhammednashat/images_shopping_app/main/girl.jpg'
+   await Product.updateOne({_id:product._id} ,{ $set: { imageUrl: newImageUrl } })
+    
+  });
+  return res.json(products);
+} catch (error) {
+    return res.json({ error });
+ }
+  return res.status(201).json({ msg: "do" });
 })
+
+
+router.get('/products-by-category', async (req, res) => {
+  try {
+    const { mainCategory } = req.body;
+    console.log("Category:", mainCategory);
+    const products = await Product.find({ mainCategory });
+    return res.json(products);
+  } catch (error) {
+    return res.json({ error });
+  }
+});
+
+
+router.post('/add-all-products', async (req, res) => {
+  try {
+    const dataPath = path.join(__dirname, "data", "products.json");
+    const products = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+    await Product.deleteMany({}); 
+    await Product.insertMany(products);
+    console.log('✅ Upload completed');
+    return res.json({"msg":"done"})
+  } catch (error) {
+  return res.json({ error: error });
+  }
+});
 
 router.post('/add-product', async (req, res) => {
   try {
     console.log(req.body)
-   
+
     var product = Product({ ...req.body })
     try {
       product = await product.save()
       return res.json(product);
-
-
     } catch (error) {
       return res.json({ error: "error2 " });
-
     }
 
     //  console.log(product)

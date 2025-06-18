@@ -5,6 +5,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 const authRouter = require('./routes/auth')
 const productRouter = require('./routes/product')
+const categoryRouter = require('./routes/category');
+
 
 //  start
 const admin = require('firebase-admin');
@@ -30,22 +32,23 @@ app.use(cors());
 
 app.use(`${apiUrl}/`, authRouter)
 app.use(`${apiUrl}/`, productRouter)
-app.get('/any', (req, res) => { return res.json({ ok: "ok" }) })
+app.use(`${apiUrl}/`, categoryRouter)
 
+
+app.get('/any', (req, res) => { return res.json({ ok: "ok" }) })
+// javaScript
+// aois => express
 // API endpoint to send notifications
 app.post('/send-notification', async (req, res) => {
   const { userId, title, body } = req.body;
-
   try {
     console.log(req.body)
     const db = admin.firestore();
    const usersCollection = db.collection('Users');
    const token = (await usersCollection.doc(userId).get()).get('token');
    console.log('----------------------------')
-   console.log(token) 
+   console.log(token)
    console.log('----------------------------')
-
-
     await admin.messaging().send({
       token: token,
       notification: { title, body },
@@ -56,11 +59,7 @@ app.post('/send-notification', async (req, res) => {
   }
 });
 
-
 mongoos.connect(mongoDbConnectionString).then(() => { console.error('Connected with mongoDb') }).catch((error) => { console.error(error) });
-
-
-
 
 app.listen(port, hostName, () => {
   console.log(`the server is running at http://${hostName}:${port}`)

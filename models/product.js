@@ -14,6 +14,15 @@ const productSchema = Schema({
   originalPrice:Number,
   salePrice:Number,
   discount:String, 
+  numRating:Number,
+  description:String,
+  mainCategory:String,
+  subCategory:String,
+  
+
+
+
+
 });
 
 
