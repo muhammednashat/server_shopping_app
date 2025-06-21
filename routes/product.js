@@ -6,7 +6,6 @@ const router = require('express').Router();
 const { Product } = require('../models/product')
   const path = require("path");
     const fs = require("fs");
-const { body } = require('express-validator');
 
 router.get('/sale-products', async (req, res) => {
   try {
@@ -28,7 +27,7 @@ router.get('/new-products', async (req, res) => {
     console.log(products)
     return res.json(products);
   } catch (error) {
-    return res.json({ error: "error2 " });
+    return res.json({ error: error });
   }
 })
 
@@ -46,15 +45,14 @@ router.post('/update-products', async (req, res) => {
 } catch (error) {
     return res.json({ error });
  }
-  return res.status(201).json({ msg: "do" });
 })
 
 
 router.get('/products-by-category', async (req, res) => {
   try {
-    const { mainCategory } = req.body;
-    console.log("Category:", mainCategory);
-    const products = await Product.find({ mainCategory });
+    const { mainCategory , subCategory } = req.body;
+    console.log("Category:", mainCategory , "subCategory: ",subCategory );
+    const products = await Product.find({ mainCategory, subCategory });
     return res.json(products);
   } catch (error) {
     return res.json({ error });
