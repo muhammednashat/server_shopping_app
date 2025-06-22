@@ -75,7 +75,6 @@ exports.register = async function (req, res) {
     }
 
 
-    return res.json({ "na": "fdf" })
 
 }
 

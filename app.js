@@ -6,7 +6,7 @@ const cors = require('cors')
 const authRouter = require('./routes/auth')
 const productRouter = require('./routes/product')
 const categoryRouter = require('./routes/category');
-
+const cartRouter =  require('./routes/cart');
 
 //  start
 const admin = require('firebase-admin');
@@ -33,7 +33,7 @@ app.use(cors());
 app.use(`${apiUrl}/`, authRouter)
 app.use(`${apiUrl}/`, productRouter)
 app.use(`${apiUrl}/`, categoryRouter)
-
+app.use(`${apiUrl}/`,cartRouter)
 
 app.get('/any', (req, res) => { return res.json({ ok: "ok" }) })
 // javaScript
