@@ -1,15 +1,17 @@
 
 const { Cart } = require('../models/cart');
 const { Product } = require('../models/product')
-
+const MyResponse = require('../models/responses/response')
+const CartItemsResponse = require('../models/responses/cart_response')
+const ItemsResponse = require('../models/responses/cart_item_response')
 const router = require('express').Router();
 
-async function findCart(userId) {
+async function findCartByUserId(userId) {
     return await Cart.findOne({ "userId": userId })
 }
 
 async function getCart(userId) {
-    var cart = await findCart(userId)
+    var cart = await findCartByUserId(userId)
     if (cart == null) {
         cart = Cart({ userId });
         cart = await cart.save();
@@ -21,10 +23,12 @@ async function getCart(userId) {
 
 
 
+
 router.post('/add-cart-Item', async (req, res) => {
     try {
         const { userId, productId, quantity, size } = req.body;
         var cart = await getCart(userId)
+        console.log(cart)
         var items = cart.items
 
         items.push({
@@ -34,11 +38,10 @@ router.post('/add-cart-Item', async (req, res) => {
         })
 
         cart = await cart.save();
-
-        return res.json(cart)
+        return res.json(new MyResponse(200, "done"))
 
     } catch (error) {
-        return res.json({ error: error })
+        return res.json(new MyResponse(400, "has error"))
     }
 
 });
@@ -53,9 +56,9 @@ router.delete('/delete-cart-item', async (req, res) => {
     try {
         const { cartId, cartItemId } = req.body;
         const cart = await getCartById(cartId)
-        if(cart == null){
+        if (cart == null) {
             return res.json({ msg: " no cart " });
-        }  
+        }
         const result = await Cart.updateOne(
             { _id: cartId },
             { $pull: { items: { _id: cartItemId } } });
@@ -75,7 +78,8 @@ router.delete('/delete-cart-item', async (req, res) => {
 router.get('/get-cart-items', async (req, res) => {
     try {
         const { userId } = req.body;
-        var cart = await findCart(userId);
+        var cart = await findCartByUserId(userId);
+        console.log(cart)
         if (cart == null) {
             return res.json({
                 status: 200,
@@ -87,40 +91,18 @@ router.get('/get-cart-items', async (req, res) => {
         var productIds =
             cart.items.map((element) => element.productId);
         const products = await Product.find({ "_id": { $in: productIds } });
-        const response = productIds.map((id) => {
+        const items = productIds.map((id) => {
             const product = products.find((element) => element._id == id)
             const cartItem = cart.items.find((item) => item.productId == id);
             const quantity = cartItem.quantity;
             const price = quantity * product.salePrice
-            return {
-                "id": id,
-                quantity,
-                "name": product.name,
-                "imageUrl": product.imageUrl,
-                "salePrice": product.salePrice,
-                price
-            };
+            return new ItemsResponse(id, quantity, product.name, product.imageUrl, product.salePrice, price);
         });
         console.log(productIds);
-        return res.json(
-            {
-                status: 200,
-                msg: "done",
-                cartId: cart._id,
-                items: response
-            }
-
-        );
+        return res.json(new CartItemsResponse(200, "done", cart._id, items));
     } catch (error) {
-        return res.json(
-            {
-                status: 400,
-                msg: error,
-                cartId: cart._id,
-                items: []
-            }
+             return res.json(new CartItemsResponse(400, "error", cart._id, null));
 
-        )
     }
 })
 
