@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 const { Cart } = require('../models/cart');
 const { Product } = require('../models/product')
@@ -52,24 +53,41 @@ async function getCartById(_id) {
 }
 
 
+async function getCartResponse(cart) {
+    var productIds = cart.items.map((element) => element.productId);
+    const products = await Product.find({ "_id": { $in: productIds } });
+    const items = productIds.map((id) => {
+        const product = products.find((element) => element._id == id)
+        const cartItem = cart.items.find((item) => item.productId == id);
+        const quantity = cartItem.quantity;
+        const price = quantity * product.salePrice
+        return new ItemsResponse(cartItem._id, quantity, product.name, product.imageUrl, product.salePrice, price);
+    });
+
+    return new CartItemsResponse(200, "done", cart._id, items);
+}
+
 router.delete('/delete-cart-item', async (req, res) => {
     try {
         const { cartId, cartItemId } = req.body;
         const cart = await getCartById(cartId)
         if (cart == null) {
-            return res.json({ msg: " no cart " });
+            return res.json(new CartItemsResponse(200, "no cart", cart._id, null));
         }
         const result = await Cart.updateOne(
             { _id: cartId },
             { $pull: { items: { _id: cartItemId } } });
         if (result.modifiedCount === 0) {
-            return res.json({ msg: "not delete" });
+            return res.json(new CartItemsResponse(200, "no item", cart._id, null));
         } else {
-
-            return res.json({ msg: "done" });
+            const cart = await getCartById(cartId)
+            const cartResponse = await getCartResponse(cart)
+            console.log(cartResponse)
+            return res.json(cartResponse);
         }
     } catch (error) {
-        return res.json({ error });
+            return res.json(new CartItemsResponse(200, "error", "", null));
+
     }
 });
 
@@ -79,29 +97,14 @@ router.get('/get-cart-items', async (req, res) => {
     try {
         const { userId } = req.body;
         var cart = await findCartByUserId(userId);
-        console.log(cart)
         if (cart == null) {
-            return res.json({
-                status: 200,
-                msg: "no items",
-                cartId: null,
-                items: []
-            })
+            return res.json(new CartItemsResponse(200, "no items", cart._id, null))
         }
-        var productIds =
-            cart.items.map((element) => element.productId);
-        const products = await Product.find({ "_id": { $in: productIds } });
-        const items = productIds.map((id) => {
-            const product = products.find((element) => element._id == id)
-            const cartItem = cart.items.find((item) => item.productId == id);
-            const quantity = cartItem.quantity;
-            const price = quantity * product.salePrice
-            return new ItemsResponse(id, quantity, product.name, product.imageUrl, product.salePrice, price);
-        });
-        console.log(productIds);
-        return res.json(new CartItemsResponse(200, "done", cart._id, items));
+        const cartResponse = await getCartResponse(cart)
+        console.log(cartResponse)
+        return res.json(cartResponse);
     } catch (error) {
-             return res.json(new CartItemsResponse(400, "error", cart._id, null));
+        return res.json(new CartItemsResponse(400, "error", cart._id, null));
 
     }
 })
