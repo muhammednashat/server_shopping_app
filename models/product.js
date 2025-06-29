@@ -18,11 +18,6 @@ const productSchema = Schema({
   description:String,
   mainCategory:String,
   subCategory:String,
-  
-
-
-
-
 });
 
 
