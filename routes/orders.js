@@ -11,45 +11,42 @@ const ItemsResponse = require('../models/responses/cart_item_response')
 async function getCartItems(cart) {
 
   try {
-    var totalPrice = 0.0
+    
     var productIds = cart.items.map((element) => element.productId);
     const products = await Product.find({ "_id": { $in: productIds } });
-
-
     const items = productIds.map((id) => {
       const product = products.find((element) => element._id == id)
       const cartItem = cart.items.find((item) => item.productId == id);
       const quantity = cartItem.quantity;
       const price = quantity * product.salePrice
-      totalPrice += price
-      return new ItemsResponse(cartItem._id, quantity, product.name, product.imageUrl, product.salePrice, price, cartItem.size);
+   
+      return {id:cartItem._id, 
+        quantity,
+        productName:product.name, 
+        imageUrl:product.imageUrl,
+         salePrice:product.salePrice,
+          price, 
+        size  :cartItem.size
+        
+        };
     });
-    console.log("======================");
-    console.log(items);
-    console.log("======================");
+   
     return items
   } catch (error) {
     return null;
   }
 
-
-
 }
 
-function buildNewOrder(userCart) {
+async function buildNewOrder(userCart) {
 
-  const items = getCartItems(userCart);
-
-  console.log(items);
-
-
+  const items = await getCartItems(userCart);
   const date = new Date();
-  const status = "Delivered";
+  const status = "Processing";
   const userId = userCart.userId;
   const quantity = 12;
   const shippingAddress = "";
   const deliveryMethod = "";
-  console.log("re23");
 
   const newOrder = new Order({
     date: date,
@@ -60,7 +57,9 @@ function buildNewOrder(userCart) {
     deliveryMethod: deliveryMethod,
     items: items
   });
-  console.log("re2");
+ console.log("====================bd==");
+    console.log(newOrder);
+    console.log("=================bd=====");
 
   return newOrder;
 }
@@ -73,7 +72,9 @@ router.post('/submet-order', async (req, res) => {
     const userId = req.body;
     const userCart = await Cart.findOne(userId)
 
-    const newOrder = buildNewOrder(userCart)
+    const newOrder = await buildNewOrder(userCart)
+
+    
 
     try {
       const { _id } = await newOrder.save()

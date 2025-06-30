@@ -1,14 +1,14 @@
 const {Schema, model} = require('mongoose')
 
 const orderSchema = Schema({
-    items:{type:[Object] , required:true},
+    userId:String,
     date:Date,
     status:String,
     totalAmount:Number,
     quantity:Number,
     shippingAddress:String,
     deliveryMethod:String,
-    userId:String,
+    items:{type:[Object] },
   
 });
 
