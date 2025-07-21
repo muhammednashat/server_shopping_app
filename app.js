@@ -8,16 +8,12 @@ const productRouter = require('./routes/product')
 const categoryRouter = require('./routes/category');
 const cartRouter =  require('./routes/cart');
 const orderRouter = require('./routes/orders')
+const { connectRedis } = require('./redis_clinent');
+// connectRedis();
 
-//  start
-const admin = require('firebase-admin');
-// Initialize Firebase Admin SDK
-var serviceAccount = require("./serviceAcount.json");
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://myproject-18932-default-rtdb.firebaseio.com"
-});
-// end
+
+
+
 
 require('dotenv/config')
 const env = process.env
@@ -38,28 +34,7 @@ app.use(`${apiUrl}/`,cartRouter)
 app.use(`${apiUrl}/`,orderRouter)
 
 app.get('/any', (req, res) => { return res.json({ ok: "ok" }) })
-// javaScript
-// aois => express
-// API endpoint to send notifications
-app.post('/send-notification', async (req, res) => {
-  const { userId, title, body } = req.body;
-  try {
-    console.log(req.body)
-    const db = admin.firestore();
-   const usersCollection = db.collection('Users');
-   const token = (await usersCollection.doc(userId).get()).get('token');
-   console.log('----------------------------')
-   console.log(token)
-   console.log('----------------------------')
-    await admin.messaging().send({
-      token: token,
-      notification: { title, body },
-    });
-    res.status(200).json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+
 
 mongoos.connect(mongoDbConnectionString).then(() => { console.error('Connected with mongoDb') }).catch((error) => { console.error(error) });
 

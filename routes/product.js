@@ -2,6 +2,10 @@
 //
 
 // create a router to handling routes.
+
+const { client } = require('../redis_clinent');
+
+
 const router = require('express').Router();
 const { Product } = require('../models/product')
   const path = require("path");
@@ -18,14 +22,16 @@ router.get('/sale-products', async (req, res) => {
   }
 });
 
+async function cachProducts(key,products) {
+  await client.set(key, JSON.stringify(products));
+}
 
 
 router.get('/new-products', async (req, res) => {
   try {
-    const query = { "isnew": true };
-    var products = await Product.find(query)
-    console.log(products)
-    return res.json(products);
+     const query = { "isnew": true };
+     var products = await Product.find(query)
+     return res.json(products);
   } catch (error) {
     return res.json({ error: error });
   }
@@ -60,6 +66,29 @@ router.get('/products-by-category', async (req, res) => {
 });
 
 
+router.post('/cache-all-products', async(req,res) =>{
+  try {
+    const products = await Product.find();
+    const arrayOfPairs = products.map((p) => [p._id.toString() , p]);
+    await client.set('products', JSON.stringify(arrayOfPairs));
+    return res.json(arrayOfPairs);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+router.get("/get-all-products", async (req, res) => {
+  try {
+    const products = await Product.find();
+    return res.json(products);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 router.post('/add-all-products', async (req, res) => {
   try {
     const dataPath = path.join(__dirname, "data", "products.json");
@@ -85,9 +114,6 @@ router.post('/add-product', async (req, res) => {
       return res.json({ error: "error2 " });
     }
 
-    //  console.log(product)
-
-    return res.json({ msg: "done2" });
   } catch (error) {
     return res.json({ error: "error" });
   }

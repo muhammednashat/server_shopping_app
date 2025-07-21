@@ -22,7 +22,7 @@ async function getCartItems(cart) {
    
       return {id:cartItem._id, 
         quantity,
-        productName:product.name, 
+        name:product.name, 
         imageUrl:product.imageUrl,
          salePrice:product.salePrice,
           price, 
@@ -45,6 +45,7 @@ async function buildNewOrder(userCart) {
   const status = "Processing";
   const userId = userCart.userId;
   const quantity = 12;
+  const totalAmount = 12.0;
   const shippingAddress = "";
   const deliveryMethod = "";
 
@@ -53,6 +54,7 @@ async function buildNewOrder(userCart) {
     status: status,
     shippingAddress: shippingAddress,
     userId: userId,
+    totalAmount:totalAmount,
     quantity: quantity,
     deliveryMethod: deliveryMethod,
     items: items
@@ -67,18 +69,17 @@ async function buildNewOrder(userCart) {
 
 
 
-router.post('/submet-order', async (req, res) => {
+router.post('/submit-order', async (req, res) => {
   try {
-    const userId = req.body;
-    const userCart = await Cart.findOne(userId)
-
-    const newOrder = await buildNewOrder(userCart)
-
     
+    const userId = req.body;
+    console.log(userId);
 
+    const userCart = await Cart.findOne(userId)
+    const newOrder = await buildNewOrder(userCart)
     try {
       const { _id } = await newOrder.save()
-      // await Cart.deleteOne(userId)
+      await Cart.deleteOne(userId)
       return res.json(_id);
     } catch (error) {
       return res.json({ error });
