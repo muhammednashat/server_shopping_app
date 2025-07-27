@@ -5,7 +5,7 @@
 
 ### 📱 Related Project:
 This backend powers my **Flutter Shopping App** — a complete mobile-first e-commerce solution.  
-👉 Check out the frontend here: [Flutter Shopping App Repo](https://github.com/muhammednashat/flutter-shopping-app)
+👉 Check out the frontend here: [Flutter Shopping App Repo](https://github.com/muhammednashat/flutter_shopping_app)
 
 ---
 
